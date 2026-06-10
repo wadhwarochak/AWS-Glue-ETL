@@ -1,0 +1,42 @@
+{
+  "name" : "sample-flights-data-etl",
+  "jobMode" : "VISUAL",
+  "description" : "",
+  "role" : "arn:aws:iam::231740516500:role/service-role/AWSGlueServiceRole",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-231740516500-us-east-1/scripts/sample-flights-data-etl.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-231740516500-us-east-1/sparkHistoryLogs/",
+    "--enable-job-insights" : "true",
+    "--enable-observability-metrics" : "true",
+    "--conf" : "spark.eventLog.rolling.enabled=true --conf spark.sql.catalog.glue_catalog.glue.skip-name-validation=true",
+    "--enable-glue-datacatalog" : "true",
+    "--enable-continuous-cloudwatch-log" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--job-language" : "python",
+    "--TempDir" : "s3://aws-glue-assets-231740516500-us-east-1/temporary/"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 10,
+  "timeout" : 480,
+  "maxCapacity" : 10.0,
+  "glueVersion" : "5.1",
+  "numberOfWorkers" : 10,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "codeGenConfigurationNodes" : "{\"node-1781092900972\":{\"CatalogSource\":{\"Database\":\"flight-source-ddb\",\"Name\":\"AWS Glue Data Catalog\",\"PartitionPredicate\":\"\",\"Table\":\"rw21_qtb_gluedemo_source_data\"}},\"node-1781093109036\":{\"ApplyMapping\":{\"Inputs\":[\"node-1781092938594\"],\"Mapping\":[{\"Dropped\":false,\"FromPath\":[\"fl_date\"],\"FromType\":\"string\",\"ToKey\":\"flight_date\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"airline_id\"],\"FromType\":\"long\",\"ToKey\":\"airline_id\",\"ToType\":\"long\"},{\"Dropped\":false,\"FromPath\":[\"origin_airport_id\"],\"FromType\":\"long\",\"ToKey\":\"origin_airport_id\",\"ToType\":\"long\"},{\"Dropped\":false,\"FromPath\":[\"origin_city_name\"],\"FromType\":\"string\",\"ToKey\":\"origin_city_name\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"dest_airport_id\"],\"FromType\":\"long\",\"ToKey\":\"dest_airport_id\",\"ToType\":\"long\"},{\"Dropped\":false,\"FromPath\":[\"dest_city_name\"],\"FromType\":\"string\",\"ToKey\":\"dest_city_name\",\"ToType\":\"string\"},{\"Dropped\":false,\"FromPath\":[\"dep_time\"],\"FromType\":\"long\",\"ToKey\":\"departure_time\",\"ToType\":\"timestamp\"},{\"Dropped\":false,\"FromPath\":[\"arr_time\"],\"FromType\":\"long\",\"ToKey\":\"arrival_time\",\"ToType\":\"timestamp\"}],\"Name\":\"Change Schema\"}},\"node-1781093246276\":{\"S3GlueParquetTarget\":{\"AutoDataQuality\":{\"EvaluationContext\":\"EvaluateDataQuality_node1781092750979\",\"IsEnabled\":true},\"Compression\":\"snappy\",\"Inputs\":[\"node-1781093109036\"],\"Name\":\"Amazon S3\",\"NumberTargetPartitions\":\"0\",\"PartitionKeys\":[],\"Path\":\"s3://rw21-qtb-gluedemo-target-data\",\"SchemaChangePolicy\":{\"EnableUpdateCatalog\":false}}},\"node-1781092938594\":{\"DropFields\":{\"Inputs\":[\"node-1781092900972\"],\"Name\":\"Drop Fields\",\"Paths\":[[\"year\"],[\"quarter\"],[\"month\"],[\"day_of_month\"],[\"day_of_week\"],[\"unique_carrier\"],[\"carrier\"],[\"tail_num\"],[\"fl_num\"],[\"origin_airport_seq_id\"],[\"origin_city_market_id\"],[\"origin\"],[\"origin_state_abr\"],[\"origin_state_fips\"],[\"origin_state_nm\"],[\"origin_wac\"],[\"dest_airport_seq_id\"],[\"dest_city_market_id\"],[\"dest\"],[\"dest_state_abr\"],[\"dest_state_fips\"],[\"dest_state_nm\"],[\"dest_wac\"],[\"crs_dep_time\"],[\"dep_delay\"],[\"dep_delay_new\"],[\"dep_del15\"],[\"dep_delay_group\"],[\"dep_time_blk\"],[\"taxi_out\"],[\"wheels_off\"],[\"wheels_on\"],[\"taxi_in\"],[\"crs_arr_time\"],[\"arr_delay\"],[\"arr_delay_new\"],[\"arr_del15\"],[\"arr_delay_group\"],[\"arr_time_blk\"],[\"cancelled\"],[\"cancellation_code\"],[\"diverted\"],[\"crs_elapsed_time\"],[\"actual_elapsed_time\"],[\"air_time\"],[\"flights\"],[\"distance\"],[\"distance_group\"],[\"partition_0\"],[\"partition_1\"],[\"partition_2\"],[\"mon\"],[\"carrier_delay\"],[\"weather_delay\"],[\"nas_delay\"],[\"security_delay\"],[\"late_aircraft_delay\"],[\"first_dep_time\"],[\"total_add_gtime\"],[\"longest_add_gtime\"]]}}}",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "AWS-Glue-ETL",
+    "branch" : "main",
+    "folder" : "01-Visual-ETL"
+  }
+}
