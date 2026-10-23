@@ -1,0 +1,41 @@
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+ 
+## @params: [JOB_NAME]
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+ 
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+ 
+# Data source: reading from S3
+datasource0 = glueContext.create_dynamic_frame.from_catalog(
+    database="flights_db",
+    table_name="sample_etl_table_getting_started",
+    transformation_ctx="datasource0"
+)
+
+# Transformation: Filter the data as per requirement
+transformed_data = Filter.apply(
+    frame=datasource0,
+    f=lambda x: x["cancelled"] > 0
+)
+
+# Data sink: writing the data back to S3
+datasink4 = glueContext.write_dynamic_frame.from_options(
+    frame=transformed_data,
+    connection_type="s3",
+    connection_options={
+        "path": "s3://qtb-gluedemo-target-data/demo-visual-script/"
+    },
+    format="json",
+    transformation_ctx="datasink4"
+)
+
+job.commit()
