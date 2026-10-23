@@ -1,0 +1,36 @@
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+from awsgluedq.transforms import EvaluateDataQuality
+
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+# Default ruleset used by all target nodes with data quality enabled
+DEFAULT_DATA_QUALITY_RULESET = """
+    Rules = [
+        ColumnCount > 0
+    ]
+"""
+
+# Script generated for node AWS Glue Data Catalog
+AWSGlueDataCatalog_node1792716546750 = glueContext.create_dynamic_frame.from_catalog(database="flight-source-db", table_name="rw21_gluedemo_source_data", transformation_ctx="AWSGlueDataCatalog_node1792716546750")
+
+# Script generated for node Drop Fields
+DropFields_node1792716567070 = DropFields.apply(frame=AWSGlueDataCatalog_node1792716546750, paths=["year", "quarter", "month", "day_of_month", "day_of_week", "unique_carrier", "carrier", "tail_num", "fl_num", "origin_airport_seq_id", "origin_city_market_id", "origin", "origin_state_abr", "origin_state_fips", "origin_state_nm", "origin_wac", "dest_airport_seq_id", "dest_city_market_id", "dest", "dest_state_abr", "dest_state_fips", "dest_state_nm", "dest_wac", "crs_dep_time", "dep_delay", "dep_delay_new", "dep_del15", "dep_delay_group", "dep_time_blk", "taxi_out", "wheels_off", "wheels_on", "taxi_in", "crs_arr_time", "arr_delay", "arr_delay_new", "arr_del15", "arr_delay_group", "arr_time_blk", "cancelled", "cancellation_code", "diverted", "crs_elapsed_time", "actual_elapsed_time", "air_time", "flights", "distance", "distance_group", "carrier_delay", "weather_delay", "nas_delay", "security_delay", "late_aircraft_delay", "first_dep_time", "total_add_gtime", "longest_add_gtime"], transformation_ctx="DropFields_node1792716567070")
+
+# Script generated for node Change Schema
+ChangeSchema_node1792716729081 = ApplyMapping.apply(frame=DropFields_node1792716567070, mappings=[("fl_date", "string", "flight_date", "string"), ("airline_id", "long", "airline_id", "long"), ("origin_airport_id", "long", "origin_airport_id", "long"), ("origin_city_name", "string", "origin_city_name", "string"), ("dest_airport_id", "long", "dest_airport_id", "long"), ("dest_city_name", "string", "dest_city_name", "string"), ("dep_time", "long", "departure_time", "long"), ("arr_time", "long", "arrival_time", "timestamp")], transformation_ctx="ChangeSchema_node1792716729081")
+
+# Script generated for node Amazon S3
+EvaluateDataQuality().process_rows(frame=ChangeSchema_node1792716729081, ruleset=DEFAULT_DATA_QUALITY_RULESET, publishing_options={"dataQualityEvaluationContext": "EvaluateDataQuality_node1792716458454", "enableDataQualityResultsPublishing": True}, additional_options={"dataQualityResultsPublishing.strategy": "BEST_EFFORT", "observations.scope": "ALL"})
+AmazonS3_node1792717217560 = glueContext.write_dynamic_frame.from_options(frame=ChangeSchema_node1792716729081, connection_type="s3", format="csv", connection_options={"path": "s3://rw21-gluedemo-target-data", "partitionKeys": []}, transformation_ctx="AmazonS3_node1792717217560")
+
+job.commit()
